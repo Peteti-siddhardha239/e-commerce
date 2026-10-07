@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🪐 SidduKart — 3D Hyper-Commerce & Next-Gen Spatial Shopping</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <!-- Three.js Offline with CDN Fallback -->
+  <script src="js/three.min.js"></script>
+  <script>
+    if (typeof THREE === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+    }
+  </script>
+</head>
+<body>
+  <div id="app-viewport-container">
+
+    <!-- ================= TOP GLOBAL HEADER ================= -->
+    <header class="top-header-bar">
+      <!-- Left: Logo & Delivery Pincode -->
+      <div class="header-left-col">
+        <div class="brand-logo-wrap" onclick="app.showHome()" title="SidduKart Home">
+          <span class="brand-logo-icon">🪐</span>
+          <div class="brand-title-box">
+            <span class="brand-name">SidduKart</span>
+            <span class="brand-tagline">Spatial 3D Commerce</span>
+          </div>
+        </div>
+
+        <div class="header-delivery-box" onclick="app.showToast('📍 Delivery Location: Hyderabad - 500033 (Changeable in Checkout)')" title="Change Delivery Location">
+          <span class="delivery-loc-icon">📍</span>
+          <div class="delivery-loc-text">
+            <span class="delivery-lbl">Deliver to Siddhardha</span>
+            <span class="delivery-val">Hyderabad 500033</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center: Universal Search Bar -->
+      <div class="header-center-col">
+        <div class="search-input-wrapper">
+          <select class="search-category-select" onchange="app.selectCategory(this.value)">
+            <option value="all">All Categories</option>
+            <option value="mobiles">Mobiles</option>
+            <option value="laptops">Laptops</option>
+            <option value="audio">Audio</option>
+            <option value="wearables">Smartwatches</option>
+            <option value="gaming">Gaming</option>
+            <option value="fashion">Fashion</option>
+          </select>
+          <input type="text" id="global-search-input" class="search-input-field" 
+                 placeholder="Search Apple, Samsung, Sony, Nike, 3D products... (Press '/')" 
+                 oninput="app.onSearchInput(this.value)" />
+          <button class="search-voice-btn" title="Simulated Voice Search" onclick="app.triggerVoiceSearch()">
+            🎙️
+          </button>
+          <button class="search-submit-btn" onclick="app.showHome()" title="Search">
+            🔍
+          </button>
+        </div>
+      </div>
+
+      <!-- Right: SuperCoins, Navigation, Sound, Fit Screen -->
+      <div class="header-right-col">
+        <div class="supercoins-pill" title="SidduKart SuperCoins Balance">
+          <span>🪙</span>
+          <span id="user-supercoins-display">450 🪙</span>
+        </div>
+
+        <button class="header-action-btn main-nav-btn active" data-view="home" onclick="app.showHome()" title="Home Feed (1 or H)">
+          <span>🏠</span> Home
+        </button>
+
+        <button class="header-action-btn main-nav-btn" data-view="orders" onclick="app.showOrders()" title="My Orders & 3D Tracking (3 or O)">
+          <span>📦</span> Orders
+        </button>
+
+        <button class="header-action-btn main-nav-btn" data-view="wishlist" onclick="app.showWishlist()" title="Wishlist (4 or W)">
+          <span>🤍</span> Wishlist
+          <span id="wishlist-badge-count" class="badge-counter" style="display: none;">0</span>
+        </button>
+
+        <button class="header-action-btn main-nav-btn" data-view="cart" onclick="app.showCart()" title="Cart (2 or C)">
+          <span>🛒</span> Cart
+          <span id="cart-badge-count" class="badge-counter">1</span>
+        </button>
+
+        <button class="header-action-btn main-nav-btn" data-view="lab" onclick="app.show3DLab()" title="3D Interactive Lab (5 or L)">
+          <span>🔮</span> 3D Lab
+        </button>
+
+        <button id="sound-toggle-btn" class="btn-ctrl-tool" onclick="app.toggleSound()" title="Sound FX Toggle (M)">
+          🔊 Sound: On
+        </button>
+
+        <button id="fit-screen-btn" class="btn-ctrl-tool" onclick="app.cycleFitMode()" title="Adjust UI scale for your monitor (F)">
+          📐 Fit: Auto
+        </button>
+      </div>
+    </header>
+
+    <!-- ================= SECONDARY CATEGORY STRIP ================= -->
+    <nav class="category-strip-bar" id="category-pills-bar">
+      <!-- Injected via app.renderCategoryPills() -->
+    </nav>
+
+    <!-- ================= MAIN SCROLLABLE BODY ================= -->
+    <main id="app-main-content">
+
+      <!-- VIEW 1: HOME CATALOG & DEALS -->
+      <section id="home-view" class="view-section active">
+        <!-- Festive Hero Deals Banner -->
+        <div class="hero-banner-card">
+          <div class="hero-banner-content">
+            <span class="hero-tag">⚡ SIDDU BIG BILLION & GREAT FESTIVAL SALE</span>
+            <h1 class="hero-title">Experience Shopping in Real 3D & Spatial AR</h1>
+            <p class="hero-subtitle">
+              Inspect flagship gadgets from every angle, customize chassis finishes in real-time, 
+              and track deliveries with live 3D route paths!
+            </p>
+            <div class="hero-badges-row">
+              <span class="hero-pill-badge">💳 Up to ₹10,000 Instant Card Discount</span>
+              <span class="hero-pill-badge">⚡ Siddu Prime 1-Day & 2-Hour Drone Delivery</span>
+              <span class="hero-pill-badge">🔄 10-Day No-Questions Replacement</span>
+            </div>
+          </div>
+
+          <div class="hero-timer-box">
+            <div class="timer-label">Flash Deals End In</div>
+            <div id="deal-timer-clock" class="timer-clock">04:32:19</div>
+            <div class="timer-subtext">Prices Increase Tonight</div>
+          </div>
+        </div>
+
+        <!-- Deals of the Day Carousel -->
+        <div class="deals-carousel-section">
+          <div class="section-header-row">
+            <h2 class="section-title">
+              <span class="section-title-icon">⚡</span> Lightning Deals of the Day
+            </h2>
+            <span class="view-all-link" onclick="app.selectCategory('all')">View All Deals →</span>
+          </div>
+          <div id="deal-of-the-day-grid" class="deal-of-the-day-grid">
+            <!-- Injected via app.renderDealOfTheDay() -->
+          </div>
+        </div>
+
+        <!-- 2-Column Catalog Layout: Filters Sidebar + Products Grid -->
+        <div class="catalog-main-layout">
+          <!-- Left: Filter Sidebar -->
+          <aside class="filters-sidebar-pane">
+            <div class="filters-header">
+              <span class="filters-title">Filters</span>
+              <button class="btn-reset-filters" onclick="app.resetFilters()">Clear All</button>
+            </div>
+
+            <!-- Price Filter Slider -->
+            <div class="filter-group">
+              <div class="filter-group-title">Price Range</div>
+              <input type="range" id="price-slider-input" class="price-range-slider" 
+                     min="5000" max="400000" step="5000" value="400000" 
+                     oninput="app.setPriceFilter(this.value)" />
+              <div class="price-val-readout">Up to <span id="price-filter-val">₹4,00,000</span></div>
+            </div>
+
+            <!-- Sort By -->
+            <div class="filter-group">
+              <div class="filter-group-title">Sort By</div>
+              <select class="sort-select-box" onchange="app.setSortBy(this.value)">
+                <option value="featured">Featured / Bestseller</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="rating">Customer Rating</option>
+                <option value="discount">Highest Discount</option>
+              </select>
+            </div>
+
+            <!-- Customer Ratings -->
+            <div class="filter-group">
+              <div class="filter-group-title">Customer Ratings</div>
+              <label class="filter-checkbox-label">
+                <input type="radio" name="rating-filter" value="4.5" onchange="app.setRatingFilter(this.value)" />
+                <span>★ 4.5 & Above</span>
+              </label>
+              <label class="filter-checkbox-label">
+                <input type="radio" name="rating-filter" value="4.0" onchange="app.setRatingFilter(this.value)" />
+                <span>★ 4.0 & Above</span>
+              </label>
+              <label class="filter-checkbox-label">
+                <input type="radio" name="rating-filter" value="0" checked onchange="app.setRatingFilter(this.value)" />
+                <span>All Ratings</span>
+              </label>
+            </div>
+
+            <!-- Siddu Assured Only -->
+            <div class="filter-group">
+              <div class="filter-group-title">Assurance & Prime</div>
+              <label class="filter-checkbox-label">
+                <input type="checkbox" id="filter-assured-checkbox" onchange="app.toggleAssuredFilter(this.checked)" />
+                <span>⚡ Siddu Assured Only</span>
+              </label>
+            </div>
+
+            <!-- Brand Filter -->
+            <div class="filter-group">
+              <div class="filter-group-title">Popular Brands</div>
+              <label class="filter-checkbox-label">
+                <input type="checkbox" onchange="app.onSearchInput(this.checked ? 'Apple' : '')" />
+                <span>Apple</span>
+              </label>
+              <label class="filter-checkbox-label">
+                <input type="checkbox" onchange="app.onSearchInput(this.checked ? 'Samsung' : '')" />
+                <span>Samsung</span>
+              </label>
+              <label class="filter-checkbox-label">
+                <input type="checkbox" onchange="app.onSearchInput(this.checked ? 'Sony' : '')" />
+                <span>Sony</span>
+              </label>
+              <label class="filter-checkbox-label">
+                <input type="checkbox" onchange="app.onSearchInput(this.checked ? 'Bose' : '')" />
+                <span>Bose</span>
+              </label>
+              <label class="filter-checkbox-label">
+                <input type="checkbox" onchange="app.onSearchInput(this.checked ? 'Marshall' : '')" />
+                <span>Marshall</span>
+              </label>
+              <label class="filter-checkbox-label">
+                <input type="checkbox" onchange="app.onSearchInput(this.checked ? 'Nintendo' : '')" />
+                <span>Nintendo</span>
+              </label>
+              <label class="filter-checkbox-label">
+                <input type="checkbox" onchange="app.onSearchInput(this.checked ? 'Logitech' : '')" />
+                <span>Logitech</span>
+              </label>
+              <label class="filter-checkbox-label">
+                <input type="checkbox" onchange="app.onSearchInput(this.checked ? 'Fujifilm' : '')" />
+                <span>Fujifilm</span>
+              </label>
+              <label class="filter-checkbox-label">
+                <input type="checkbox" onchange="app.onSearchInput(this.checked ? 'Nike' : '')" />
+                <span>Nike</span>
+              </label>
+              <label class="filter-checkbox-label">
+                <input type="checkbox" onchange="app.onSearchInput(this.checked ? 'Ray-Ban' : '')" />
+                <span>Ray-Ban</span>
+              </label>
+            </div>
+          </aside>
+
+          <!-- Right: Products Catalog Grid -->
+          <div class="products-catalog-section">
+            <div class="section-header-row">
+              <h2 class="section-title">
+                <span class="section-title-icon">🛍️</span> All Products
+              </h2>
+              <span id="results-count-text" class="text-muted" style="font-size: 13px;">Showing products</span>
+            </div>
+            <div id="products-catalog-grid" class="products-grid-container">
+              <!-- Injected via app.renderProducts() -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: CART & CHECKOUT BREAKDOWN -->
+      <section id="cart-view" class="view-section">
+        <div class="section-header-row">
+          <h2 class="section-title">
+            <span class="section-title-icon">🛒</span> Shopping Cart & Price Details
+          </h2>
+          <button class="btn btn-outline" onclick="app.showHome()">← Continue Shopping</button>
+        </div>
+
+        <div id="cart-empty-state" class="empty-products-card" style="display: none;">
+          <div class="empty-icon">🛒</div>
+          <h3>Your SidduKart Cart is Empty</h3>
+          <p>Discover our top-rated flagships, audio gear, and 3D gadgets to start shopping!</p>
+          <button class="btn btn-primary" onclick="app.showHome()">Explore Flagships</button>
+        </div>
+
+        <div id="cart-full-layout" class="cart-full-grid">
+          <!-- Cart Items Left Column -->
+          <div id="cart-items-list" class="cart-items-container">
+            <!-- Injected via app.renderCart() -->
+          </div>
+
+          <!-- Sticky Price Details Right Column -->
+          <div id="cart-price-breakdown-box">
+            <!-- Injected via app.renderCart() -->
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: MY ORDERS & 3D LIVE TRACKING -->
+      <section id="orders-view" class="view-section">
+        <div class="section-header-row">
+          <h2 class="section-title">
+            <span class="section-title-icon">📦</span> My Orders & Live Shipping Path
+          </h2>
+          <button class="btn btn-outline" onclick="app.showHome()">← Back to Store</button>
+        </div>
+
+        <div id="orders-list-container" class="orders-list-wrap">
+          <!-- Injected via ordersManager.renderOrdersList() -->
+        </div>
+      </section>
+
+      <!-- VIEW 4: WISHLIST -->
+      <section id="wishlist-view" class="view-section">
+        <div class="section-header-row">
+          <h2 class="section-title">
+            <span class="section-title-icon">🤍</span> My Saved Wishlist
+          </h2>
+          <button class="btn btn-outline" onclick="app.showHome()">← Back to Store</button>
+        </div>
+        <div id="wishlist-grid-container" class="products-grid-container">
+          <!-- Injected via app.renderWishlist() -->
+        </div>
+      </section>
+
+      <!-- VIEW 5: 3D INTERACTIVE LAB STUDIO -->
+      <section id="lab-view" class="view-section">
+        <div class="section-header-row">
+          <h2 class="section-title">
+            <span class="section-title-icon">🔮</span> 3D Spatial Interactive Lab
+          </h2>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <label style="font-size: 13px; color: var(--text-muted);">Choose Product:</label>
+            <select id="lab-product-select" class="sort-select-box" onchange="app.onLabProductChange(this.value)">
+              <!-- Injected dynamically -->
+            </select>
+            <button class="btn btn-primary" onclick="app.toggle3DExplode()">💥 Exploded View</button>
+            <button class="btn btn-outline" onclick="app.toggle3DAutoRotate()">🔄 360 Spin</button>
+          </div>
+        </div>
+
+        <div class="viewer-3d-canvas-wrap" style="height: 540px;">
+          <div id="lab-3d-canvas-container" style="width: 100%; height: 100%;"></div>
+          <div class="viewer-3d-controls-overlay">
+            <div class="hud-badge">🖱️ Drag to rotate 360° | Scroll to zoom | Right-click to pan</div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-ctrl-tool" onclick="app.set3DLighting('studio')">Studio White</button>
+              <button class="btn-ctrl-tool" onclick="app.set3DLighting('cyber')">Cyber Neon</button>
+              <button class="btn-ctrl-tool" onclick="app.set3DLighting('warm')">Warm Sunset</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ================= FLOATING COMPARE DRAWER ================= -->
+    <div id="compare-floating-drawer" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--bg-surface-elevated); border: 1.5px solid var(--primary-blue); padding: 12px 20px; border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); z-index: 500; align-items: center; gap: 16px;">
+      <span style="font-size: 13px; font-weight: 700;">⚖️ Compare Products:</span>
+      <div id="compare-drawer-items" style="display: flex; gap: 10px;"></div>
+      <button class="btn btn-primary btn-sm" onclick="app.openCompareModal()">Compare Now</button>
+    </div>
+
+  </div> <!-- /#app-viewport-container -->
+
+
+  <!-- ================= MODALS SECTION ================= -->
+
+  <!-- MODAL 1: PRODUCT DETAILS MODAL -->
+  <div id="product-details-modal" class="modal-overlay">
+    <div class="modal-dialog" style="max-width: 900px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Product Details</h3>
+        <button class="btn-close-modal" onclick="app.closeProductModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="product-modal-grid">
+          <!-- Left: Gallery & 3D trigger -->
+          <div class="modal-gallery-col">
+            <div class="modal-main-img-box">
+              <img id="modal-main-img" src="" alt="Product Image" />
+              <button class="btn-3d-inspect" onclick="app.launch3DViewer(app.selectedProductForModal.id)">
+                🧊 View in 3D / AR
+              </button>
+            </div>
+            <div id="modal-gallery-thumbs" class="modal-gallery-thumbs"></div>
+          </div>
+
+          <!-- Right: Info, Price, Color Swatches, Specs -->
+          <div class="modal-details-col">
+            <span id="modal-product-brand" class="product-brand"></span>
+            <h2 id="modal-product-title" style="font-size: 20px; font-weight: 800;"></h2>
+            <div id="modal-product-rating" class="text-green" style="font-size: 13px; font-weight: 700;"></div>
+
+            <div class="modal-price-box">
+              <span id="modal-product-price" class="current-price" style="font-size: 24px;"></span>
+              <span id="modal-product-original" class="original-price" style="font-size: 15px;"></span>
+              <span id="modal-product-discount" class="discount-badge" style="font-size: 15px;"></span>
+            </div>
+
+            <div id="modal-product-emi" style="font-size: 12px; color: var(--amazon-gold);"></div>
+            <div id="modal-product-delivery" style="font-size: 12px; color: var(--emerald-green); font-weight: 600;"></div>
+
+            <!-- Color Swatches -->
+            <div>
+              <div style="font-size: 12px; font-weight: 700; margin-bottom: 6px;">
+                Color: <span id="modal-selected-color-name" style="color: var(--primary-blue);"></span>
+              </div>
+              <div id="modal-color-swatches" class="color-swatches-row"></div>
+            </div>
+
+            <!-- Description -->
+            <p id="modal-product-desc" style="font-size: 13px; color: var(--text-muted); line-height: 1.4;"></p>
+
+            <!-- Bank Offers -->
+            <div>
+              <div style="font-size: 12px; font-weight: 700; margin-bottom: 6px;">Available Offers:</div>
+              <ul id="modal-offers-list" class="offers-list"></ul>
+            </div>
+
+            <!-- Technical Specs Table -->
+            <div>
+              <div style="font-size: 12px; font-weight: 700; margin-bottom: 6px;">Technical Specifications:</div>
+              <table id="modal-specs-table" class="specs-table"></table>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 12px; margin-top: 10px;">
+              <button class="btn btn-outline" style="flex: 1;" onclick="app.addModalProductToCart()">
+                🛒 Add to Cart
+              </button>
+              <button class="btn btn-primary" style="flex: 1; background: linear-gradient(135deg, var(--amazon-gold), #ea580c); color: #000; font-weight: 800;" onclick="app.buyModalProductNow()">
+                ⚡ Buy Now
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: 3D INTERACTIVE PRODUCT VIEWER -->
+  <div id="product-3d-modal" class="modal-overlay">
+    <div class="modal-dialog" style="max-width: 960px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <span>🧊</span> <span id="viewer-product-title">3D Interactive Product Studio</span>
+        </h3>
+        <button class="btn-close-modal" onclick="app.close3DViewer()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-3d-layout">
+          <!-- 3D Canvas Box -->
+          <div class="viewer-3d-canvas-wrap">
+            <div id="three-product-canvas-container"></div>
+            <div class="viewer-3d-controls-overlay">
+              <div class="hud-badge">🖱️ Drag to rotate 360° | Scroll to zoom</div>
+              <div style="display: flex; gap: 8px;">
+                <button id="btn-autorotate-toggle" class="btn-ctrl-tool" onclick="app.toggle3DAutoRotate()">⏸️ Pause Spin</button>
+                <button id="btn-explode-toggle" class="btn-ctrl-tool" onclick="app.toggle3DExplode()">💥 Exploded View</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: 3D Customizer Sidebar -->
+          <div class="viewer-sidebar-controls">
+            <div class="viewer-ctrl-group">
+              <div class="viewer-ctrl-title">Chassis Color Finish</div>
+              <div id="viewer-colors-list" class="viewer-colors-grid"></div>
+            </div>
+
+            <div class="viewer-ctrl-group">
+              <div class="viewer-ctrl-title">Studio Lighting</div>
+              <select class="viewer-lighting-select" onchange="app.set3DLighting(this.value)">
+                <option value="studio">Studio Neutral (Clean)</option>
+                <option value="cyber">Cyberpunk Neon</option>
+                <option value="warm">Warm Golden Hour</option>
+              </select>
+            </div>
+
+            <div class="viewer-ctrl-group">
+              <div class="viewer-ctrl-title">Spatial Features</div>
+              <p style="font-size: 11px; color: var(--text-dim); line-height: 1.4;">
+                Procedurally generated 3D components rendered in real-time with WebGL & PBR shaders. 
+                Click "Exploded View" to see internal architectural separation!
+              </p>
+            </div>
+
+            <button class="btn btn-primary btn-block" onclick="app.quickAddToCart(app.selectedProductForModal ? app.selectedProductForModal.id : 'prod-1')">
+              🛒 Add This 3D Config to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: 3D LIVE SHIPPING PATH TRACKER -->
+  <div id="shipping-tracker-modal" class="modal-overlay">
+    <div class="modal-dialog" style="max-width: 1000px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 22px;">🚚</span>
+          <div>
+            <h3 class="modal-title">Live 3D Shipping Path & Package Route</h3>
+            <span style="font-size: 11px; color: var(--text-muted);">
+              Order ID: <strong id="tracker-order-id" style="color: #38bdf8;"></strong> | 
+              Tracking ID: <span id="tracker-tracking-id"></span>
+            </span>
+          </div>
+        </div>
+        <button class="btn-close-modal" onclick="ordersManager.closeShippingTrackerModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="tracker-split-layout">
+          <!-- 3D Canvas Box -->
+          <div class="tracker-canvas-box">
+            <div id="shipping-3d-canvas-container"></div>
+            <div class="tracker-canvas-overlay">
+              <div class="hud-badge">
+                Status: <strong id="tracker-status-text" style="color: #34d399;">Out for Delivery</strong>
+              </div>
+              <div class="hud-badge">
+                ETA: <strong id="tracker-eta-text" style="color: #fbbf24;">Today by 2:30 PM</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Driver Details & Timeline -->
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div class="tracker-driver-card">
+              <div class="driver-info-row">
+                <div class="driver-avatar">👨‍✈️</div>
+                <div>
+                  <div class="driver-name-text" id="driver-name">Raju V.</div>
+                  <div class="driver-sub-text" id="driver-vehicle">Siddu EV Prime SuperVan</div>
+                  <div class="driver-sub-text" style="color: var(--amazon-gold);" id="driver-rating">4.9 ★ (1,420 deliveries)</div>
+                </div>
+              </div>
+              <div class="driver-otp-box">
+                <span>Delivery OTP:</span>
+                <span class="otp-value" id="delivery-otp">7492</span>
+              </div>
+            </div>
+
+            <!-- Checkpoint Timeline -->
+            <div style="font-size: 13px; font-weight: 700;">Delivery Checkpoints:</div>
+            <div id="tracker-timeline-list" class="timeline-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: MULTI-STEP CHECKOUT -->
+  <div id="checkout-modal" class="modal-overlay">
+    <div class="modal-dialog" style="max-width: 720px;">
+      <div class="modal-header">
+        <h3 class="modal-title">⚡ Express Checkout</h3>
+        <button class="btn-close-modal" onclick="app.closeCheckoutModal()">✕</button>
+      </div>
+
+      <!-- Checkout Breadcrumb Steps -->
+      <div class="checkout-breadcrumbs">
+        <div class="checkout-breadcrumb-step active" onclick="app.setCheckoutStep(1)">1. Delivery Address</div>
+        <div class="checkout-breadcrumb-step" onclick="app.setCheckoutStep(2)">2. Delivery Speed</div>
+        <div class="checkout-breadcrumb-step" onclick="app.setCheckoutStep(3)">3. Payment</div>
+      </div>
+
+      <div class="modal-body">
+        <!-- Step 1: Address -->
+        <div class="checkout-step-pane active" id="checkout-step-1">
+          <div class="address-form-grid">
+            <div class="form-field-group">
+              <label>Full Name</label>
+              <input type="text" id="ship-name-input" class="form-input" value="Siddhardha" />
+            </div>
+            <div class="form-field-group">
+              <label>Mobile Number</label>
+              <input type="text" id="ship-phone-input" class="form-input" value="+91 99887 76655" />
+            </div>
+            <div class="form-field-group full-width">
+              <label>Street Address / Flat No.</label>
+              <input type="text" id="ship-street-input" class="form-input" value="Plot No. 42, Road No. 36, Jubilee Hills" />
+            </div>
+            <div class="form-field-group">
+              <label>City</label>
+              <input type="text" id="ship-city-input" class="form-input" value="Hyderabad" />
+            </div>
+            <div class="form-field-group">
+              <label>Pincode</label>
+              <input type="text" id="ship-pincode-input" class="form-input" value="500033" />
+            </div>
+          </div>
+          <button class="btn btn-primary btn-block" style="margin-top: 14px;" onclick="app.setCheckoutStep(2)">
+            Continue to Delivery Options →
+          </button>
+        </div>
+
+        <!-- Step 2: Delivery Speed -->
+        <div class="checkout-step-pane" id="checkout-step-2">
+          <div class="delivery-options-grid">
+            <label class="delivery-opt-card">
+              <input type="radio" name="delivery-speed" value="Siddu Prime 1-Day" checked />
+              <div>
+                <div style="font-weight: 700;">⚡ Siddu Prime Express (Tomorrow by 11 AM)</div>
+                <div style="font-size: 11px; color: var(--emerald-green);">FREE for Siddu Prime Members</div>
+              </div>
+            </label>
+            <label class="delivery-opt-card">
+              <input type="radio" name="delivery-speed" value="Hyperlocal Drone" />
+              <div>
+                <div style="font-weight: 700;">🛸 2-Hour Hyperlocal Drone Delivery</div>
+                <div style="font-size: 11px; color: var(--primary-blue);">Delivered directly to designated safe landing pad (+₹99 waived today)</div>
+              </div>
+            </label>
+            <label class="delivery-opt-card">
+              <input type="radio" name="delivery-speed" value="Standard Surface" />
+              <div>
+                <div style="font-weight: 700;">📦 Standard Delivery (2-3 Business Days)</div>
+                <div style="font-size: 11px; color: var(--text-dim);">Eco-friendly ground transit</div>
+              </div>
+            </label>
+          </div>
+          <div style="display: flex; gap: 10px; margin-top: 14px;">
+            <button class="btn btn-outline" style="flex: 1;" onclick="app.setCheckoutStep(1)">← Back</button>
+            <button class="btn btn-primary" style="flex: 2;" onclick="app.setCheckoutStep(3)">Proceed to Payment →</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Payment Options -->
+        <div class="checkout-step-pane" id="checkout-step-3">
+          <div class="payment-tabs-grid">
+            <label class="payment-method-row">
+              <input type="radio" name="payment-method" value="SidduPay UPI" checked />
+              <div>
+                <strong>SidduPay UPI (Instant 0% Convenience Fee)</strong>
+                <div style="font-size: 11px; color: var(--text-muted);">Google Pay, PhonePe, Paytm, or BHIM QR code</div>
+              </div>
+            </label>
+
+            <!-- 3D Credit Card Preview -->
+            <label class="payment-method-row">
+              <input type="radio" name="payment-method" value="Credit / Debit Card" />
+              <div>
+                <strong>Credit / Debit Card (HDFC, SBI, ICICI, Axis)</strong>
+                <div style="font-size: 11px; color: var(--text-muted);">10% Instant Festive Cashback applied</div>
+              </div>
+            </label>
+
+            <div class="mock-credit-card">
+              <div class="card-chip"></div>
+              <div class="card-num-text">•••• •••• •••• 9042</div>
+              <div class="card-bottom-row">
+                <span>SIDDHARDHA</span>
+                <span>EXP: 08/29</span>
+              </div>
+            </div>
+
+            <label class="payment-method-row">
+              <input type="radio" name="payment-method" value="Cash on Delivery" />
+              <div>
+                <strong>Cash on Delivery (COD) / Pay on Delivery via UPI QR</strong>
+                <div style="font-size: 11px; color: var(--text-muted);">Pay directly to the courier agent with OTP verification</div>
+              </div>
+            </label>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; border-top: 1px solid var(--border-color); padding-top: 14px;">
+            <div>
+              <span style="font-size: 12px; color: var(--text-dim);">Total Payable:</span>
+              <div id="checkout-final-amount" style="font-size: 22px; font-weight: 800; color: var(--amazon-gold);"></div>
+            </div>
+            <button class="btn btn-primary btn-place-order" style="padding: 10px 24px;" onclick="app.submitFinalOrder()">
+              🔒 Pay & Place Order
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 5: ORDER CELEBRATION -->
+  <div id="order-celebration-modal" class="modal-overlay">
+    <div class="modal-dialog" style="max-width: 520px; text-align: center; position: relative;">
+      <div id="confetti-canvas-container"></div>
+      <div class="modal-body" style="padding: 36px 24px; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+        <div style="font-size: 56px;">🎉</div>
+        <h2 style="font-size: 24px; font-weight: 800; color: var(--emerald-green);">Order Placed Successfully!</h2>
+        <p style="font-size: 13px; color: var(--text-muted);">
+          Thank you for shopping on SidduKart. Your package has been assigned to our automated fulfillment center.
+        </p>
+
+        <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px 20px; width: 100%; display: flex; flex-direction: column; gap: 6px; font-size: 13px;">
+          <div>Order ID: <strong id="celeb-order-id" style="color: #38bdf8;"></strong></div>
+          <div>Tracking ID: <span id="celeb-tracking-id"></span></div>
+          <div>Total Paid: <strong id="celeb-total-paid" style="color: var(--amazon-gold);"></strong></div>
+          <div>Estimated Delivery: <strong id="celeb-delivery-eta" style="color: var(--emerald-green);"></strong></div>
+        </div>
+
+        <button class="btn btn-primary btn-block btn-track" style="margin-top: 10px;" onclick="app.closeOrderCelebrationModal()">
+          🚚 Track Shipping Path in 3D
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 6: TAX INVOICE PRINT VIEW -->
+  <div id="invoice-modal" class="modal-overlay">
+    <div class="modal-dialog" style="max-width: 820px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Tax Invoice Preview</h3>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn btn-primary btn-sm" onclick="ordersManager.printInvoice()">🖨️ Print / Save PDF</button>
+          <button class="btn-close-modal" onclick="ordersManager.closeInvoiceModal()">✕</button>
+        </div>
+      </div>
+      <div class="modal-body" style="background: #e2e8f0; padding: 24px;">
+        <div id="invoice-print-area"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 7: COMPARE PRODUCTS MODAL -->
+  <div id="compare-modal" class="modal-overlay">
+    <div class="modal-dialog" style="max-width: 960px;">
+      <div class="modal-header">
+        <h3 class="modal-title">⚖️ Compare Product Specifications</h3>
+        <button class="btn-close-modal" onclick="app.closeCompareModal()">✕</button>
+      </div>
+      <div class="modal-body" id="compare-modal-content"></div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="js/products-data.js"></script>
+  <script src="js/audio-fx.js"></script>
+  <script src="js/three-product-viewer.js"></script>
+  <script src="js/three-shipping-tracker.js"></script>
+  <script src="js/cart-checkout.js"></script>
+  <script src="js/orders-manager.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

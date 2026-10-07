@@ -1,0 +1,12 @@
+{
+  "name": "siddu-kart",
+  "version": "1.0.0",
+  "description": "Next-Gen 3D Hyper-Commerce & Spatial Shopping Platform inspired by Flipkart & Amazon",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "keywords": ["ecommerce", "threejs", "3d", "shopping", "flipkart", "amazon", "siddu-kart"],
+  "author": "SidduKart Team",
+  "license": "MIT"
+}
